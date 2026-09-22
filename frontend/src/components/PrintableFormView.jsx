@@ -118,6 +118,12 @@ export const PrintableFormView = ({ form, student, onBack }) => {
     receiptNo: 'PB-SEU-849201',
 
     // 4. PAY IN VOUCHER (SEU-PIV-VOUCHER)
+    pivPurpose: 'Repeat Examination Fee',
+    pivCategory: 'Examination Fee',
+    pivAmount: '400',
+    pivCourse: student?.degreeProgramme || 'Bachelor of Information and Communication Technology (BICT)',
+    pivAccountNo: '228 1001 9000 1704',
+    pivBankBranch: "People's Bank, Addalaichenai Branch",
     examFee: '400',
     medicalFee: '0',
     registrationFee: '0',
@@ -284,6 +290,15 @@ export const PrintableFormView = ({ form, student, onBack }) => {
       if (!formData.rescrutinyCode?.trim()) errors.rescrutinyCode = 'Subject code is required.';
       if (!formData.gradeReceived?.trim()) errors.gradeReceived = 'Grade received is required.';
       if (!formData.receiptNo?.trim()) errors.receiptNo = 'Receipt number is required.';
+    }
+
+    if (form.formId === 'SEU-PIV-VOUCHER') {
+      if (!formData.name?.trim()) errors.name = 'Depositor name is required.';
+      if (!formData.registrationNumber?.trim()) errors.registrationNumber = 'Registration number is required.';
+      if (!formData.pivAmount?.toString().trim() && !formData.examFeesPaid?.toString().trim()) {
+        errors.pivAmount = 'Amount in figures is required.';
+      }
+      if (!formData.amountWords?.trim()) errors.amountWords = 'Amount in words is required.';
     }
 
     if (Object.keys(errors).length > 0) {
@@ -1291,31 +1306,55 @@ export const PrintableFormView = ({ form, student, onBack }) => {
         return (
           <div className="printable-document">
             <div style={{ textAlign: 'center', marginBottom: '14px' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>PEOPLE'S BANK — ADDALAICHENAI BRANCH</h2>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>PAY IN VOUCHER (PIV) — SOUTH EASTERN UNIVERSITY OF SRI LANKA</h3>
-              <div style={{ fontSize: '0.8rem', color: '#555' }}>Account No: 228 1001 9000 1704</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '0.03em' }}>PEOPLE'S BANK — ADDALAICHENAI BRANCH</div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 700, margin: '3px 0' }}>PAY IN VOUCHER (PIV) — SOUTH EASTERN UNIVERSITY OF SRI LANKA</div>
+              <div style={{ fontSize: '0.85rem', color: '#333', fontWeight: 600 }}>Account No: 228 1001 9000 1704 · Oluvil / Addalaichenai</div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', fontSize: '0.78rem' }}>
               {['BANK COPY', 'BURSAR COPY', 'STUDENT COPY'].map((copyTitle, idx) => (
-                <div key={idx} style={{ border: '1.5px solid #000', padding: '10px', position: 'relative' }}>
-                  <div style={{ textAlign: 'center', fontWeight: 'bold', borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '8px' }}>
-                    {copyTitle}
+                <div key={idx} style={{ border: '1.5px solid #000', padding: '10px', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '440px' }}>
+                  <div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', borderBottom: '1.5px solid #000', paddingBottom: '4px', marginBottom: '8px', fontSize: '0.82rem', letterSpacing: '0.05em' }}>
+                      {copyTitle}
+                    </div>
+                    <div style={{ lineHeight: 1.75 }}>
+                      <div>Date: <strong>{formData.applicationDate}</strong></div>
+                      <div>Depositor: <strong>{formData.name.toUpperCase()}</strong></div>
+                      <div>Reg No: <strong>{formData.registrationNumber.toUpperCase()}</strong></div>
+                      <div>Course: <strong>{formData.pivCourse || 'BICT (Faculty of Tech)'}</strong></div>
+                      <div>Faculty: <strong>Faculty of Technology</strong></div>
+                      <div>Purpose: <strong>{formData.pivPurpose || formData.pivCategory || 'Examination / Medical Fees'}</strong></div>
+                      {formData.remarks && (
+                        <div style={{ fontSize: '0.72rem', color: '#444' }}>Ref: {formData.remarks}</div>
+                      )}
+                      <div style={{ marginTop: '10px', borderTop: '1px solid #999', paddingTop: '6px' }}>
+                        Amount in Figures: <strong style={{ fontSize: '0.92rem' }}>Rs. {formData.pivAmount || formData.examFeesPaid || '400'}/=</strong>
+                      </div>
+                      <div style={{ fontStyle: 'italic', fontSize: '0.74rem', marginTop: '2px' }}>
+                        ({formData.amountWords || 'Four Hundred Rupees Only'})
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ lineHeight: 1.8 }}>
-                    <div>Date: <strong>{formData.applicationDate}</strong></div>
-                    <div>Name: <strong>{formData.name}</strong></div>
-                    <div>Reg No: <strong>{formData.registrationNumber}</strong></div>
-                    <div>Faculty: <strong>Faculty of Technology</strong></div>
-                    <div>Purpose: <strong>Examination / Medical Fees</strong></div>
-                    <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '4px' }}>
-                      Amount: <strong>Rs. {formData.examFeesPaid || '400'}/=</strong>
+
+                  <div style={{ marginTop: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '14px' }}>
+                      {formData.signatureImage ? (
+                        <img src={formData.signatureImage} alt="Depositor Signature" style={{ maxHeight: '34px', maxWidth: '120px', objectFit: 'contain' }} />
+                      ) : (
+                        <div style={{ height: '34px', display: 'flex', alignItems: 'flex-end', fontStyle: 'italic', fontSize: '0.72rem' }}>
+                          {formData.name}
+                        </div>
+                      )}
+                      <div style={{ borderTop: '1px solid #000', width: '90%', textAlign: 'center', fontSize: '0.68rem', paddingTop: '2px' }}>
+                        Depositor's Signature
+                      </div>
                     </div>
-                    <div style={{ fontStyle: 'italic', fontSize: '0.72rem' }}>
-                      ({formData.amountWords || 'Four Hundred Rupees Only'})
-                    </div>
-                    <div style={{ marginTop: '30px', textAlign: 'center', borderTop: '1px dotted #000', paddingTop: '2px' }}>
-                      Bank Officer / Cashier Stamp
+
+                    <div style={{ border: '1px dashed #666', padding: '6px', textAlign: 'center', fontSize: '0.68rem', backgroundColor: '#fafafa' }}>
+                      <div style={{ fontWeight: 600 }}>Bank Officer / Cashier</div>
+                      <div style={{ height: '22px' }}></div>
+                      <div style={{ borderTop: '1px dotted #888', paddingTop: '1px' }}>Signature &amp; Bank Rubber Stamp</div>
                     </div>
                   </div>
                 </div>
@@ -2463,6 +2502,151 @@ export const PrintableFormView = ({ form, student, onBack }) => {
                         </span>
                       )}
                     </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* ==========================================================
+              FORM 5: PAY IN VOUCHER (SEU-PIV-VOUCHER)
+              ========================================================== */}
+          {form.formId === 'SEU-PIV-VOUCHER' && (
+            <>
+              <div className="seu-card">
+                <div className="seu-card-header">
+                  <div className="seu-card-title">
+                    <User size={18} color="var(--primary-600)" />
+                    <span>1. Depositor &amp; Banking Details</span>
+                  </div>
+                  <span className="badge badge-info">People's Bank - Addalaichenai</span>
+                </div>
+
+                <div className="grid-2">
+                  <div className="form-group" style={{ gridColumn: '1/-1' }}>
+                    <label className="form-label">Depositor Full Name *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={formData.name}
+                      onChange={(e) => handleChange('name', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Registration Number *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      style={{ textTransform: 'uppercase', fontWeight: 600 }}
+                      value={formData.registrationNumber}
+                      onChange={(e) => handleChange('registrationNumber', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Course of Study / Degree Programme</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={formData.pivCourse}
+                      onChange={(e) => handleChange('pivCourse', e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Contact Mobile Number</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      value={formData.phone}
+                      onChange={(e) => handleChange('phone', e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">University Bank Account</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value="A/C: 228 1001 9000 1704 (Addalaichenai Branch)"
+                      disabled
+                      style={{ backgroundColor: 'var(--bg-surface-hover)', fontWeight: 600 }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="seu-card">
+                <div className="seu-card-header">
+                  <div className="seu-card-title">
+                    <BookOpen size={18} color="var(--primary-600)" />
+                    <span>2. Fee Breakdown &amp; Remittance Amount</span>
+                  </div>
+                </div>
+
+                <div className="grid-2">
+                  <div className="form-group">
+                    <label className="form-label">Fee Purpose Category *</label>
+                    <select
+                      className="form-input"
+                      value={formData.pivCategory}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        handleChange('pivCategory', val);
+                        handleChange('pivPurpose', val);
+                      }}
+                    >
+                      <option value="Repeat Examination Fee">Examination Fee (Repeat / Resit)</option>
+                      <option value="Registration Fee">Registration Fee / Renewal</option>
+                      <option value="Medical Fee">Medical Endorsement Fee</option>
+                      <option value="Convocation Fee">Convocation Fee</option>
+                      <option value="Re-registration Fee">Re-registration Fee</option>
+                      <option value="Re-scrutinization Fee">Re-scrutinization of Marks (Rs. 500)</option>
+                      <option value="Other Fee">Other Miscellaneous University Fee</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Amount in Figures (Rs.) *</label>
+                    <input
+                      type="number"
+                      className="form-input"
+                      style={{ fontWeight: 700, fontSize: '1.05rem' }}
+                      value={formData.pivAmount}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        handleChange('pivAmount', val);
+                        handleChange('examFeesPaid', val);
+                      }}
+                      placeholder="e.g. 400"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: '1/-1' }}>
+                    <label className="form-label">Amount in Words *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={formData.amountWords}
+                      onChange={(e) => handleChange('amountWords', e.target.value)}
+                      placeholder="e.g. Four Hundred Rupees Only"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: '1/-1' }}>
+                    <label className="form-label">Payment Remarks / Description</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={formData.remarks}
+                      onChange={(e) => handleChange('remarks', e.target.value)}
+                      placeholder="e.g. Repeat exam payment for ICT21013, ICT21023 (Semester I)"
+                    />
                   </div>
                 </div>
               </div>

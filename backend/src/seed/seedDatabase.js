@@ -416,48 +416,53 @@ export const runSeed = async () => {
       ]
     });
 
-    // Form 2 from Image: Absent by Medical Form
+    // Form 2 from Scans: Medical Submission Form (Office of the Dean, Faculty of Technology - 2-Page Official Form)
     await FormDocument.create({
       formId: 'SEU-MED-ABSENT',
-      name: 'Absent by Medical Form',
-      officialTitle: 'SOUTH EASTERN UNIVERSITY OF SRI LANKA — FACULTY OF TECHNOLOGY: ABSENT BY MEDICAL',
-      issuingDivision: 'Faculty of Technology / Dean\'s Office',
+      name: 'Medical Submission Form',
+      officialTitle: 'SOUTH EASTERN UNIVERSITY OF SRI LANKA — OFFICE OF THE DEAN, FACULTY OF TECHNOLOGY: MEDICAL SUBMISSION FORM',
+      issuingDivision: 'Office of the Dean, Faculty of Technology',
       category: 'Medical / Attendance',
-      description: 'Official faculty attendance excuse form for absences due to medical illness across scheduled lectures and laboratories.',
-      purpose: 'Documents dates and subject codes missed due to medical grounds to preserve ESA examination attendance percentage.',
-      whoShouldUse: 'All students of Faculty of Technology absent from lectures or practical sessions on validated medical grounds.',
-      whenToUse: 'Within 7 working days from the expiration of certified medical leave.',
-      eligibility: 'Must be supported by a genuine Medical Certificate from UMC SEUSL or a Government Hospital DMO.',
+      description: 'Official 2-page unified Medical Submission Form (Front: Details of Applicant, Subject, Leave Dates, Reason for Absence, 8 Requested Subjects; Back: Office Use, Head of Department Recommendation, Dean\'s Office Forwarding).',
+      purpose: 'Formal submission of medical leave and justification for absence with certified medical certificate to Dean\'s Office and Head of Department.',
+      whoShouldUse: 'All students of Faculty of Technology (Fresh and Repeat candidates) absent due to illness across lectures, Continuous Assessment (CA), or End Semester Examinations.',
+      whenToUse: 'Within two weeks of the illness or last examination date (or written notice within 48 hours to Senior Assistant Registrar if falling ill during examinations).',
+      eligibility: 'Must be supported by a certified medical certificate from a qualified government medical officer or university medical center.',
       requiredInformation: [
-        'Name of the Student',
-        'Academic Year (e.g. 2025/2026)',
-        'Registration Number',
-        'Contact Number',
-        'Medical Submission Date',
-        'Medical Leave From and To dates',
-        'Specialization',
-        'Grid of Absent Dates and corresponding Subject Codes'
+        '1. Details of the Applicant: Name, Reg No, Index No, Candidate Type [Repeat/Fresh], Department, Postal Address',
+        '2. Subject: Attendance for Lecture, End Semester Exam, Continuous Assessment (CA), or Other Specify',
+        '3. Dates of Medical Leave (From date and To date)',
+        '4. Reason for Absence Statement & Annexed Certified Medical Certificate',
+        '5. Requested Subject/s (8-row table with S.No, Subject Code, Subject Name)',
+        'Signature of the Student & Application Date',
+        'Back Side (Page 2): Office Use Received Date & Remarks, HoD Recommendation & Signature, Dean\'s Office Forwarding'
       ],
       requiredDocuments: [
-        'Original Medical Certificate (endorsed by UMC CMO or Govt DMO)',
-        'Duly completed Absent by Medical schedule grid'
+        'Original Certified Medical Certificate (from UMC SEUSL or Government Hospital DMO)',
+        'Copy of notice sent to Senior Assistant Registrar within 48 hours (if exam absence)',
+        'Completed 2-Page Medical Submission Form with Student Signature'
       ],
       approvalRequirements: [
         'Signature of the Student',
-        'Signature and Stamp of the Head of the Department'
+        'Recommendation and Signature of the Head of Department',
+        'Dean\'s Office Receipt and Formal Endorsement'
       ],
-      submissionLocation: 'Department of ICT / Head of Department Office, Faculty of Technology',
-      deadline: 'Within 7 days of returning to campus',
+      submissionLocation: 'Office of the Dean / Head of Department, Faculty of Technology, SEUSL',
+      deadline: 'Within 2 weeks of the last exam date; written notice within 48 hours if during examinations',
       instructions: [
-        'Fill in your name, registration number, and contact number accurately.',
-        'Specify the exact start date and end date of the medical leave approved by the medical officer.',
-        'In the subject grid, list each date missed in the left column and write the relevant subject code in the header column.',
-        'Sign the form and submit it to the Head of Department for formal review and attendance credit.'
+        'Section 1: Enter your full name, registration number, index number, repeat/fresh status, department, and postal address.',
+        'Section 2: Tick the appropriate subject category (Lecture attendance, End Semester Examination, CA, or specify other).',
+        'Section 3: Specify the exact leave dates (From and To).',
+        'Section 4: Detail the medical reason and upload the certified medical certificate.',
+        'Section 5: Enter the course code and title for all subjects requested (up to 8 rows).',
+        'Upload your signature and click Submit & Generate Official Form.',
+        'Download or print the generated official 2-page document containing Page 1 (Applicant Side) and Page 2 (Office Use & HoD/Dean endorsements).'
       ],
       printable: true,
       downloadable: true,
       status: 'Published'
     });
+
 
     // Form 3 from Image: Pay In Voucher (PIV)
     await FormDocument.create({
@@ -543,45 +548,62 @@ export const runSeed = async () => {
       status: 'Published'
     });
 
-    // Form 5 from Image: Application for Examination (End Semester Examination) (Repeat Candidates only)
+    // Form 5 from Scans: Application for Examination (Examinations Division - 2-Page Official Form)
     await FormDocument.create({
       formId: 'SEU-EX-ESA-REP',
-      name: 'Application for Examination (End Semester Examination) (Repeat Candidates only)',
-      officialTitle: 'SOUTH EASTERN UNIVERSITY OF SRI LANKA — EXAMINATION DIVISION: APPLICATION FOR EXAMINATION (End Semester Examination) (Repeat Candidates only)',
-      issuingDivision: 'Examination Division',
+      name: 'Application for Examination',
+      officialTitle: 'SOUTH EASTERN UNIVERSITY OF SRI LANKA — EXAMINATIONS DIVISION: APPLICATION FOR EXAMINATION',
+      issuingDivision: 'Examinations Division',
       category: 'Examination',
-      description: 'Comprehensive registration form for repeat candidates appearing for End Semester Examinations (ESA) in theory and practical components.',
-      purpose: 'Official registration for repeat ESA candidate indexing, timetable scheduling, and admission card generation.',
-      whoShouldUse: 'Students repeating an ESA module or resitting for grade upgrade under university repeat regulations.',
-      whenToUse: 'During the ESA repeat registration window advertised on SEUConnect notices.',
-      eligibility: 'Must have valid Continuous Assessment (CA) marks on record and meet examination prerequisite rules.',
+      description: 'Official 2-page unified Examination Application Form (Page 1: Part I Candidate particulars 01-13, 12-row applied subjects schedule, attempt count; Page 2: 14 Fees paid, PIV voucher affix attachment box, candidate declaration & signature, Part II Subject In-charge & SAR verification, Part III Deputy Registrar/Exams approval).',
+      purpose: 'Comprehensive university examination registration for Fresh and Repeat candidates for End Semester Examinations.',
+      whoShouldUse: 'Undergraduate candidates (FT, FAS, FE, FMC, FIA, FAC) appearing for End Semester Examinations.',
+      whenToUse: 'During the official examination registration period announced by the Examinations Division.',
+      eligibility: 'Must be an enrolled student with requisite attendance and coursework completion.',
       requiredInformation: [
-        'Full name with initials in BLOCK LETTERS',
-        'University Registration Number (SEU/IS/FT/...)',
-        'Faculty and Semester',
-        'List of repeat modules with Course Code and Title',
-        'Previous examination attempt details',
-        'Bank Pay In Voucher number and date'
+        '01. Name with initials (Mr. / Ms.) in BLOCK CAPITAL letters',
+        '02. Registration No: SEU / IS / Faculty / Year / Index',
+        '03. Current Batch intake academic year',
+        '04. Faculty (FT / FE / FAS / FMC / FIA / FAC)',
+        '05. Medium (English / Tamil)',
+        '06. Semester (I / II)',
+        '07. Applied for (Fresh / Repeat)',
+        '08. Year of Examinations (First / Second / Third / Fourth Year)',
+        '09. Field of Specialization',
+        '10. Present Address',
+        '11. Contact Mobile No',
+        '12. Applied Subjects (12-row schedule with Subject Code and Subject Title)',
+        '13. Repeat candidate completed attempts count',
+        '14. Fees paid by Repeat Candidate (Rs. 100/subject or Rs. 400 for 4+ subjects)',
+        'Affixed Copy of Pay In Voucher (PIV) bank payment proof',
+        'Candidate Signature and Date',
+        'Part II & Part III Official Verifications'
       ],
       requiredDocuments: [
-        'People\'s Bank PIV receipt (Account: 228 1001 9000 1704)',
-        'Student Identity Card or University Record Book copy'
+        'Affixed copy of People\'s Bank Pay In Voucher (PIV) for repeat fees',
+        'Completed 2-Page Application for Examination with Student Signature'
       ],
       approvalRequirements: [
-        'Head of Department recommendation',
-        'Senior Assistant Registrar (Examinations) approval'
+        'Signature of Candidate',
+        'Signature of Head of Department for applied subjects',
+        'Signature of Subject in-charge and Senior Assistant Registrar (Part II)',
+        'Approval of Deputy Registrar / Examinations (Part III)'
       ],
-      submissionLocation: 'Examination Division, Administrative Complex, SEUSL',
-      deadline: '3 weeks before the commencement of the end-semester examination season',
+      submissionLocation: 'Examinations Division / Administrative Complex, SEUSL',
+      deadline: 'Strictly as scheduled in the circular by the Deputy Registrar (Examinations)',
       instructions: [
-        'Carefully verify the course code and title against the curriculum handbook.',
-        'Ensure the bank payment voucher is stapled firmly to the top left corner.',
-        'Collect your verified Examination Admission Card from the department office 3 days prior to your first paper.'
+        'Complete all fields in BLOCK CAPITAL letters and tick the appropriate checkboxes.',
+        'Enter your registration number and current batch correctly.',
+        'List all applied subjects in the 12-row table with exact Subject Code and Subject Title.',
+        'For repeat candidates, calculate payment at Rs. 100/- per subject (or Rs. 400/- for 4 and more subjects).',
+        'Attach/affix your Pay In Voucher (PIV) bank receipt in the designated box on Page 2.',
+        'Upload your signature, submit, and print/download the official 2-page document.'
       ],
       printable: true,
       downloadable: true,
       status: 'Published'
     });
+
 
     // Form 6: Official Email Request Form (ICT Center)
     await FormDocument.create({

@@ -574,3 +574,62 @@ button, input, select, textarea {
   font-style: italic;
   margin-top: 2px;
 }
+
+/* Print Page Break & Multi-Page Document Styling */
+.form-page-break {
+  page-break-before: always;
+  break-before: page;
+}
+
+.page-divider-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 32px 0 20px 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.page-divider-screen::before,
+.page-divider-screen::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+
+@media print {
+  .form-page-break {
+    page-break-before: always !important;
+    break-before: page !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+  }
+
+  .printable-page-block {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  .page-divider-screen {
+    display: none !important;
+  }
+}
+
+/* Mobile responsive adjustments for university forms */
+@media (max-width: 768px) {
+  .printable-document {
+    padding: 16px !important;
+  }
+  .med-form-top-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+}
+

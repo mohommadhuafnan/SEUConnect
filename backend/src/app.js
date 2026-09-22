@@ -11,6 +11,7 @@ import formRoutes from './routes/formRoutes.js';
 import processRoutes from './routes/processRoutes.js';
 import academicRoutes from './routes/academicRoutes.js';
 import { welfareRouter, societyRouter, notificationRouter, aiRouter } from './routes/extraRoutes.js';
+import { runSeed } from './seed/seedDatabase.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -50,6 +51,22 @@ app.get('/api/health', (req, res) => {
     university: 'South Eastern University of Sri Lanka',
     timestamp: new Date()
   });
+});
+
+// Secure remote setup seed endpoint (useful for cloud deploys like Render free tier)
+app.get('/api/setup/seed', async (req, res) => {
+  const secret = req.query.secret;
+  const expectedSecret = process.env.JWT_SECRET || 'seuconnect_secret_academic_key_2026_seusl';
+  if (!secret || secret !== expectedSecret) {
+    return res.status(403).json({ success: false, message: 'Forbidden: Valid secret query parameter required.' });
+  }
+
+  try {
+    const result = await runSeed();
+    return res.json(result);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Database seeding failed', error: error.message });
+  }
 });
 
 // Error handlers

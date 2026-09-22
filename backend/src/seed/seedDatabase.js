@@ -22,11 +22,13 @@ import Membership from '../models/Membership.js';
 import Notification from '../models/Notification.js';
 import Penalty from '../models/Penalty.js';
 
-const seed = async () => {
+export const runSeed = async () => {
   try {
-    console.log('[Seeding]: Connecting to database...');
-    await mongoose.connect(ENV.MONGODB_URI);
-    console.log('[Seeding]: Connected. Purging old collections...');
+    if (mongoose.connection.readyState !== 1) {
+      console.log('[Seeding]: Connecting to database...');
+      await mongoose.connect(ENV.MONGODB_URI);
+    }
+    console.log('[Seeding]: Purging old collections...');
 
     await Promise.all([
       User.deleteMany({}),
@@ -792,11 +794,24 @@ const seed = async () => {
     console.log('Forms Seeded: 5 authentic SEUSL forms from uploaded scanned documents');
     console.log('=======================================================');
 
-    process.exit(0);
+    return {
+      success: true,
+      message: 'SEUConnect database seeded successfully!',
+      accounts: [
+        { role: 'Student', email: '22ict085@seu.ac.lk', password: 'password123', name: 'M.N.M. Afnan' },
+        { role: 'Lecturer', email: 'rk@seu.ac.lk', password: 'password123', name: 'Dr. R. Ketheeswaran' },
+        { role: 'Admin', email: 'admin@seu.ac.lk', password: 'password123', name: 'Faculty Administrator' }
+      ]
+    };
   } catch (error) {
     console.error('[Seeding Error]:', error);
-    process.exit(1);
+    throw error;
   }
 };
 
-seed();
+// Check if running directly via node CLI
+if (process.argv[1] && process.argv[1].endsWith('seedDatabase.js')) {
+  runSeed()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
+}

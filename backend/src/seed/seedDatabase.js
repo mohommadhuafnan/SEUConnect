@@ -583,6 +583,94 @@ export const runSeed = async () => {
       status: 'Published'
     });
 
+    // Form 6: Official Email Request Form (ICT Center)
+    await FormDocument.create({
+      formId: 'SEU-EMAIL-REQ',
+      name: 'Official Email Request Form',
+      officialTitle: 'SOUTH EASTERN UNIVERSITY OF SRI LANKA — OFFICIAL EMAIL REQUEST FORM',
+      issuingDivision: 'ICT Center, SEUSL',
+      category: 'Academic / Registration',
+      description: 'Official institutional email account issuance form for students, lecturers, and faculty staff to obtain an @seu.ac.lk email address.',
+      purpose: 'Acquiring an official institutional email ID for LMS access, academic communications, and university service access.',
+      whoShouldUse: 'All students (undergraduates and postgraduates) and newly appointed faculty staff.',
+      whenToUse: 'Upon initial enrollment or when requesting institutional email creation / reissue.',
+      eligibility: 'Must be a registered student or staff member of South Eastern University of Sri Lanka.',
+      requiredInformation: [
+        'Full name, First name, Last name',
+        'Designation and Student Registration Number',
+        'Department / Unit / Center and Faculty',
+        'Preferred Email ID (e.g. 22ict085@seu.ac.lk)',
+        'Purpose of the Email',
+        'WhatsApp Number for notification',
+        'Present Personal Email ID (Gmail, Yahoo, etc.)',
+        'Applicant Signature and Date'
+      ],
+      requiredDocuments: [
+        'University Identity Card (copy) or Admission Offer Letter'
+      ],
+      approvalRequirements: [
+        'Recommendation by Head of Department',
+        'Approval by Dean of Faculty',
+        'Approval by Vice Chancellor, SEUSL',
+        'Issuance by Coordinator, ICT Center'
+      ],
+      submissionLocation: 'ICT Center / Department Office, SEUSL',
+      deadline: 'Available year-round for new enrollments and academic sessions',
+      instructions: [
+        'Complete all applicant fields accurately in CAPITAL letters.',
+        'Upload your signature or sign in the applicant signature box.',
+        'Submit for Department Head and Dean endorsements.',
+        'Account credentials will be dispatched via WhatsApp and present personal email.'
+      ],
+      printable: true,
+      downloadable: true,
+      status: 'Published'
+    });
+
+    // Form 7: Application for re-scrutinization of Marks & Grades
+    await FormDocument.create({
+      formId: 'SEU-EX-RESCRUTINY',
+      name: 'Application for re-scrutinization of Marks & Grades',
+      officialTitle: 'SOUTH EASTERN UNIVERSITY OF SRI LANKA — EXAMINATIONS DIVISION: Application for re-scrutinization of Marks & Grades',
+      issuingDivision: 'Examinations Division',
+      category: 'Examination',
+      description: 'Official application for verification and re-scrutinization of examination marks and grades under Senate regulations (CC/No 078 of 09/04/2012).',
+      purpose: 'Formal re-examination of marks, arithmetic recalculation, and grade verification by the Faculty Verification Board.',
+      whoShouldUse: 'Students requesting verification of grades or marks for a completed course unit examination.',
+      whenToUse: 'Within two weeks from the date of release of semester examination results.',
+      eligibility: 'Must be an enrolled candidate who sat for the respective course unit examination.',
+      requiredInformation: [
+        'Candidate Name with Initials (Mr./Ms.)',
+        'Registration Number (SEU/IS/...) and Index Number',
+        'Subject/Course Year (1st, 2nd, 3rd, 4th) and Semester (I, II)',
+        'Faculty (FT / FAS / FE / FMC / FIA / FAC)',
+        'Contact Number and Email',
+        'Name & Year of the Examination',
+        'Subject/Course Code & Title',
+        'Grade Received',
+        'Amount Paid (Rs. 500 per subject/course)',
+        'People\'s Bank Receipt Number and Date'
+      ],
+      requiredDocuments: [
+        'Original People\'s Bank payment receipt (stapled to application)'
+      ],
+      approvalRequirements: [
+        'Verification by Deputy Registrar (Examinations)',
+        'Faculty Verification Board Committee Review and Signatures'
+      ],
+      submissionLocation: 'Examinations Division, Administrative Complex, SEUSL',
+      deadline: 'Within 14 days of official results publication',
+      instructions: [
+        'Fill in CAPITAL letters and check appropriate boxes.',
+        'Pay the required fee of Rs. 500/- per subject to People\'s Bank SEUSL Account.',
+        'Attach original bank receipt and sign the candidate signature block.',
+        'Submit directly to the Examination Division before the deadline.'
+      ],
+      printable: true,
+      downloadable: true,
+      status: 'Published'
+    });
+
     console.log('[Seeding]: Creating Process Guidance Workflows ("What do you need to do?")...');
     await Process.create([
       {

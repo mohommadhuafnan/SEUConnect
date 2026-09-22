@@ -20,7 +20,14 @@ export const getAllForms = async (req, res, next) => {
     }
 
     const userRole = req.user?.role || 'student';
-    filter.availableToRoles = { $in: [userRole, 'all', 'ALL'] };
+    filter.$and = filter.$and || [];
+    filter.$and.push({
+      $or: [
+        { availableToRoles: { $exists: false } },
+        { availableToRoles: { $size: 0 } },
+        { availableToRoles: { $in: [userRole, 'all', 'ALL', 'student'] } }
+      ]
+    });
 
     const forms = await FormDocument.find(filter).sort({ category: 1, name: 1 });
     return successResponse(res, forms);

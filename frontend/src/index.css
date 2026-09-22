@@ -75,6 +75,51 @@
   --info-bg: rgba(2, 132, 199, 0.15);
 }
 
+/* Universal Sleek Custom Scrollbars (Eliminates clunky browser scrollbar) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.28) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Dark sidebar specific scrollbar */
+.seu-sidebar div::-webkit-scrollbar {
+  width: 4px;
+}
+
+.seu-sidebar div::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+.seu-sidebar div::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -96,6 +141,17 @@ a {
 
 button, input, select, textarea {
   font-family: inherit;
+}
+
+/* Navbar Menu Toggle (Hidden on Full Screen/Desktop, Visible on Mobile) */
+.nav-menu-toggle {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .nav-menu-toggle {
+    display: inline-flex !important;
+  }
 }
 
 /* Layout Utilities */
@@ -123,7 +179,16 @@ button, input, select, textarea {
 
 @media (max-width: 768px) {
   .page-body {
-    padding: 16px;
+    padding: 14px 16px;
+  }
+  .seu-navbar {
+    padding: 0 14px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-body {
+    padding: 12px 10px;
   }
 }
 

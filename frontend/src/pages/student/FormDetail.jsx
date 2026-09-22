@@ -86,7 +86,7 @@ export const StudentFormDetail = () => {
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <button onClick={() => setShowPrintView(true)} className="btn btn-primary">
-              <Printer size={16} /> Open Printable Digital Template
+              <Printer size={16} /> Fill, Submit &amp; Download Form
             </button>
           </div>
         </div>
@@ -161,7 +161,7 @@ export const StudentFormDetail = () => {
 
         <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
           <button onClick={() => setShowPrintView(true)} className="btn btn-primary">
-            <Printer size={16} /> Fill and Print Form Now
+            <Printer size={16} /> Fill, Submit &amp; Download Form Now
           </button>
         </div>
       </Card>

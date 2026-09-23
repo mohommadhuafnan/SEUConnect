@@ -21,12 +21,20 @@ import Society from '../models/Society.js';
 import Membership from '../models/Membership.js';
 import Notification from '../models/Notification.js';
 import Penalty from '../models/Penalty.js';
+import FacultyBoardAgenda from '../models/FacultyBoardAgenda.js';
+import ExamSchedule from '../models/ExamSchedule.js';
+import { STUDENTS_DATA, formatStudentInfo } from './studentsData.js';
 
 export const runSeed = async () => {
   try {
     if (mongoose.connection.readyState !== 1) {
       console.log('[Seeding]: Connecting to database...');
-      await mongoose.connect(ENV.MONGODB_URI);
+      try {
+        await mongoose.connect(ENV.MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
+      } catch (e) {
+        console.warn(`[Seeding Warning]: Primary connection failed (${e.message}). Falling back to local MongoDB...`);
+        await mongoose.connect('mongodb://127.0.0.1:27017/seuconnect', { serverSelectionTimeoutMS: 5000 });
+      }
     }
     console.log('[Seeding]: Purging old collections...');
 
@@ -49,7 +57,9 @@ export const runSeed = async () => {
       Society.deleteMany({}),
       Membership.deleteMany({}),
       Notification.deleteMany({}),
-      Penalty.deleteMany({})
+      Penalty.deleteMany({}),
+      FacultyBoardAgenda.deleteMany({}),
+      ExamSchedule.deleteMany({})
     ]);
 
     const salt = await bcrypt.genSalt(10);
@@ -149,6 +159,40 @@ export const runSeed = async () => {
       address: 'Dean Office, Faculty of Technology, SEUSL'
     });
 
+    console.log('[Seeding]: Creating Dean of Faculty (Dr. Eleanor Grant)...');
+    const userDean = await User.create({
+      name: 'Dr. Eleanor Grant',
+      email: 'dean@seu.ac.lk',
+      passwordHash: defaultPassword,
+      role: 'dean',
+      status: 'active',
+      permissions: ['all', 'faculty_dean', 'chair_faculty_board', 'manage_departments', 'approve_intakes'],
+      phone: '+94 67 2255060',
+      address: 'Dean Office, Faculty of Technology, SEUSL'
+    });
+
+    console.log('[Seeding]: Creating HOD of ICT (Dr. Amara Silva)...');
+    const userHod = await User.create({
+      name: 'Dr. Amara Silva',
+      email: 'hod@seu.ac.lk',
+      passwordHash: defaultPassword,
+      role: 'hod',
+      status: 'active',
+      permissions: ['all', 'manage_department', 'sign_registrations', 'escalate_faculty_board'],
+      phone: '+94 67 2255062',
+      address: 'Department of ICT, Faculty of Technology, SEUSL'
+    });
+
+    const lecturerHod = await Lecturer.create({
+      userId: userHod._id,
+      staffId: 'HOD-FT-001',
+      designation: 'Senior Lecturer Gr. I & Head of Department',
+      faculty: 'Faculty of Technology',
+      department: 'Department of Information and Communication Technology',
+      specialization: 'Information Systems & Cloud Architecture',
+      officeLocation: 'Technology Building, Room 202'
+    });
+
     console.log('[Seeding]: Creating Subjects...');
     const subjects = await Subject.insertMany([
       // Year 1
@@ -175,94 +219,146 @@ export const runSeed = async () => {
     lecturer1.assignedCourses = [subjects[9]._id, subjects[10]._id, subjects[12]._id, subjects[13]._id];
     await lecturer1.save();
 
-    console.log('[Seeding]: Creating Primary Student (22ict085@seu.ac.lk)...');
-    const userStudent1 = await User.create({
-      name: 'M.N.M. Afnan',
-      email: '22ict085@seu.ac.lk',
-      passwordHash: defaultPassword,
-      role: 'student',
-      status: 'active',
-      phone: '+94 77 1234567',
-      address: 'Technology Hostel, Faculty of Technology, SEUSL'
-    });
+    console.log('[Seeding]: Creating All 113 Official Faculty Students...');
+    const studentDocs = [];
+    const studentDocMap = new Map(); // sn -> student doc
 
-    const student1 = await Student.create({
-      userId: userStudent1._id,
-      registrationNumber: '22ICT085',
-      indexNumber: 'ICT22085',
-      degreeProgramme: 'BICT',
-      academicYear: '2025/2026',
-      currentSemester: 5,
-      specialization: 'Software Systems',
-      faculty: 'Faculty of Technology',
-      department: 'Department of Information and Communication Technology',
-      sgpa: 3.42,
-      cgpa: 3.38,
-      creditsCompleted: 78,
-      creditsRegistered: 18,
-      degreeCreditsRequired: 130,
-      examEligibility: 'Eligible',
-      currentClass: 'Second Class (Upper Division)'
-    });
+    for (const raw of STUDENTS_DATA) {
+      const info = formatStudentInfo(raw);
+      const isPrimaryAfnan = raw.sn === 84;
+      const isRepeatCandidate = raw.sn === 113;
 
-    // Create 9 additional students
-    const sampleStudents = [
-      { name: 'K.L. Fathima Nusra', email: '22ict012@seu.ac.lk', reg: '22ICT012', idx: 'ICT22012', sem: 5, prog: 'BICT' },
-      { name: 'S. Thevakanthan', email: '22ict034@seu.ac.lk', reg: '22ICT034', idx: 'ICT22034', sem: 5, prog: 'BICT' },
-      { name: 'A.H. Mohamed Rizwan', email: '22ict055@seu.ac.lk', reg: '22ICT055', idx: 'ICT22055', sem: 5, prog: 'BICT' },
-      { name: 'P. Kavishan', email: '22ict067@seu.ac.lk', reg: '22ICT067', idx: 'ICT22067', sem: 5, prog: 'BICT' },
-      { name: 'M.S. Akeel Ahamed', email: '23ict019@seu.ac.lk', reg: '23ICT019', idx: 'ICT23019', sem: 3, prog: 'BICT' },
-      { name: 'N.V. Thashmila Dilshan', email: '23ict044@seu.ac.lk', reg: '23ICT044', idx: 'ICT23044', sem: 3, prog: 'BICT' },
-      { name: 'R.M. Bandara', email: '22bst015@seu.ac.lk', reg: '22BST015', idx: 'BST22015', sem: 5, prog: 'BBST' },
-      { name: 'H.M. Dilrukshi', email: '22bst032@seu.ac.lk', reg: '22BST032', idx: 'BST22032', sem: 5, prog: 'BBST' },
-      { name: 'T. Janarthanan', email: '24ict008@seu.ac.lk', reg: '24ICT008', idx: 'ICT24008', sem: 1, prog: 'BICT' }
-    ];
-
-    const studentDocs = [student1];
-    for (const s of sampleStudents) {
-      const u = await User.create({
-        name: s.name,
-        email: s.email,
+      const user = await User.create({
+        name: isPrimaryAfnan ? 'M.N.M. Afnan' : info.name,
+        email: info.email,
         passwordHash: defaultPassword,
         role: 'student',
-        status: 'active'
+        status: 'active',
+        phone: isPrimaryAfnan ? '+94 77 1234567' : `+94 77 ${String(1000000 + raw.sn).slice(1)}`,
+        address: isPrimaryAfnan ? 'Technology Hostel, Faculty of Technology, SEUSL' : 'Faculty of Technology Hostel, SEUSL'
       });
-      const st = await Student.create({
-        userId: u._id,
-        registrationNumber: s.reg,
-        indexNumber: s.idx,
-        degreeProgramme: s.prog,
+
+      const student = await Student.create({
+        userId: user._id,
+        registrationNumber: info.regNo,
+        indexNumber: info.indexNumber,
+        degreeProgramme: 'BICT',
         academicYear: '2025/2026',
-        currentSemester: s.sem,
-        specialization: s.prog === 'BICT' ? 'Software Systems' : 'Bio-systems Technology',
-        sgpa: 3.30,
-        cgpa: 3.25,
-        creditsCompleted: s.sem === 5 ? 75 : s.sem === 3 ? 42 : 16,
+        currentSemester: info.semester,
+        specialization: 'Software Systems',
+        faculty: 'Faculty of Technology',
+        department: 'Department of Information and Communication Technology',
+        sgpa: isPrimaryAfnan ? 3.42 : isRepeatCandidate ? 2.15 : Number((3.10 + ((raw.sn % 15) * 0.05)).toFixed(2)),
+        cgpa: isPrimaryAfnan ? 3.38 : isRepeatCandidate ? 2.10 : Number((3.05 + ((raw.sn % 15) * 0.05)).toFixed(2)),
+        creditsCompleted: isPrimaryAfnan ? 78 : isRepeatCandidate ? 95 : 75,
         creditsRegistered: 18,
-        degreeCreditsRequired: s.prog === 'BBST' ? 120 : 130
+        degreeCreditsRequired: 130,
+        examEligibility: (raw.sn === 112) ? 'Ineligible' : 'Eligible',
+        currentClass: isPrimaryAfnan ? 'Second Class (Upper Division)' : 'General Degree'
       });
-      studentDocs.push(st);
+
+      studentDocMap.set(raw.sn, student);
+      studentDocs.push(student);
     }
 
-    console.log('[Seeding]: Registering Semester 5 Courses for Afnan (18 credits)...');
-    // Courses 9 to 14 (6 courses * 3 cr = 18 cr)
+    const student1 = studentDocMap.get(84); // M.N.M. Afnan (SEU/IS/22/ICT/085)
+
+    console.log('[Seeding]: Registering Semester 5 Courses for All Students & Pipelines...');
     const sem5Courses = [subjects[9], subjects[10], subjects[11], subjects[12], subjects[13], subjects[14]];
+
+    // 1. For Afnan (sn: 84) - all 6 courses registered
     for (const sub of sem5Courses) {
       await SubjectRegistration.create({
         studentId: student1._id,
         subjectId: sub._id,
         semesterId: semCurrent._id,
-        status: 'REGISTERED'
+        academicYear: '2025/2026',
+        status: 'REGISTERED',
+        teacherSignature: 'Signed',
+        hodSignature: 'Signed',
+        deanOfficeStatus: 'Approved',
+        renewalPaymentStatus: 'Paid'
       });
+    }
 
-      // Also register for other sem 5 students
-      for (let i = 1; i <= 4; i++) {
+    // 2. For remaining students
+    for (const raw of STUDENTS_DATA) {
+      if (raw.sn === 84) continue;
+      const st = studentDocMap.get(raw.sn);
+
+      if (raw.sn === 113) {
+        // Repeat candidate G.Sanojan - registers for repeat course ICT21013
         await SubjectRegistration.create({
-          studentId: studentDocs[i]._id,
-          subjectId: sub._id,
+          studentId: st._id,
+          subjectId: subjects[4]._id, // ICT21013 Data Structures
           semesterId: semCurrent._id,
-          status: 'REGISTERED'
+          academicYear: '2025/2026',
+          status: 'REGISTERED',
+          teacherSignature: 'Signed',
+          hodSignature: 'Signed',
+          deanOfficeStatus: 'Approved',
+          renewalPaymentStatus: 'Paid',
+          paymentVoucherRef: 'PIV-2026-REPEAT-064'
         });
+        continue;
+      }
+
+      // For students sn 1 to 12 (HOD sign-off queue): 1 course is PENDING_APPROVAL with HOD signature Pending
+      if (raw.sn >= 1 && raw.sn <= 12) {
+        const queueCourseIndex = (raw.sn - 1) % sem5Courses.length;
+        for (let cIdx = 0; cIdx < sem5Courses.length; cIdx++) {
+          const sub = sem5Courses[cIdx];
+          const isQueueCourse = cIdx === queueCourseIndex;
+          await SubjectRegistration.create({
+            studentId: st._id,
+            subjectId: sub._id,
+            semesterId: semCurrent._id,
+            academicYear: '2025/2026',
+            status: isQueueCourse ? 'PENDING_APPROVAL' : 'REGISTERED',
+            teacherSignature: isQueueCourse ? (raw.sn % 2 === 0 ? 'Signed' : 'Missing') : 'Signed',
+            teacherSignedAt: isQueueCourse && raw.sn % 2 === 0 ? new Date(Date.now() - 2 * 24 * 3600 * 1000) : null,
+            hodSignature: isQueueCourse ? 'Pending' : 'Signed',
+            deanOfficeStatus: isQueueCourse ? 'Pending' : 'Approved',
+            renewalPaymentStatus: raw.sn % 3 === 0 ? 'Pending' : 'Paid',
+            paymentVoucherRef: `PIV-2026-${1000 + raw.sn}`
+          });
+        }
+      } else if (raw.sn >= 13 && raw.sn <= 24) {
+        // Students 13 to 24 (Dean intake queue): 1 course is PENDING_APPROVAL with HOD Signed and Dean Pending
+        const queueCourseIndex = (raw.sn - 13) % sem5Courses.length;
+        for (let cIdx = 0; cIdx < sem5Courses.length; cIdx++) {
+          const sub = sem5Courses[cIdx];
+          const isQueueCourse = cIdx === queueCourseIndex;
+          await SubjectRegistration.create({
+            studentId: st._id,
+            subjectId: sub._id,
+            semesterId: semCurrent._id,
+            academicYear: '2025/2026',
+            status: isQueueCourse ? 'PENDING_APPROVAL' : 'REGISTERED',
+            teacherSignature: 'Signed',
+            teacherSignedAt: new Date(Date.now() - 5 * 24 * 3600 * 1000),
+            hodSignature: 'Signed',
+            hodSignedAt: new Date(Date.now() - 3 * 24 * 3600 * 1000),
+            deanOfficeStatus: isQueueCourse ? ((raw.sn - 13) < 6 ? 'Received' : 'Pending') : 'Approved',
+            renewalPaymentStatus: 'Paid',
+            paymentVoucherRef: `PIV-2026-${2000 + raw.sn}`
+          });
+        }
+      } else {
+        // Regular enrolled students (25 to 112)
+        for (const sub of sem5Courses) {
+          await SubjectRegistration.create({
+            studentId: st._id,
+            subjectId: sub._id,
+            semesterId: semCurrent._id,
+            academicYear: '2025/2026',
+            status: 'REGISTERED',
+            teacherSignature: 'Signed',
+            hodSignature: 'Signed',
+            deanOfficeStatus: 'Approved',
+            renewalPaymentStatus: 'Paid'
+          });
+        }
       }
     }
 
@@ -290,22 +386,52 @@ export const runSeed = async () => {
       { studentId: student1._id, subjectId: subjects[14]._id, academicYear: '2025/2026', semester: 5, caMark: 34, esaMark: 0, finalMark: 34, grade: 'Pending', gradePoint: 3.30, qualityPoints: 9.90 }
     ]);
 
-    console.log('[Seeding]: Generating Attendance Sessions (86% Afnan attendance)...');
-    // Generate 14 past lectures for ICT22011 and other courses
-    for (let i = 1; i <= 14; i++) {
-      const isAbsent = i === 4 || i === 9; // 2 absences out of 14 = ~86% attendance
+    console.log('[Seeding]: Generating 14 Attendance Sessions for All 113 Students...');
+    // 8 students below 80% cutoff:
+    // sn: 2 (CHAMIKARA K.K.R.), sn: 11 (KAVISHKA S.V.A.S.), sn: 28 (KARANDANA K.L.H.G.),
+    // sn: 47 (W.A.S.S. KALUWILA), sn: 66 (DIVEJIKAN Y.), sn: 80 (SABRA S.P.),
+    // sn: 96 (THARUKA W.H.N.), sn: 112 (BANDARA LMRC)
+    const below80Map = {
+      2: [3, 7, 10, 13],        // absent 4 sessions -> 10/14 = 71%
+      11: [2, 5, 8, 12],        // absent 4 sessions -> 10/14 = 71%
+      28: [1, 4, 7, 9, 13],     // absent 5 sessions -> 9/14 = 64%
+      47: [2, 6, 8, 11, 14],    // absent 5 sessions -> 9/14 = 64%
+      66: [3, 5, 9, 12],        // absent 4 sessions -> 10/14 = 71%
+      80: [4, 8, 11],           // absent 3 sessions -> 11/14 = 78%
+      96: [1, 3, 6, 10, 13],    // absent 5 sessions -> 9/14 = 64%
+      112: [2, 4, 7, 9, 11, 14] // absent 6 sessions -> 8/14 = 57%
+    };
+
+    for (let sessionNum = 1; sessionNum <= 14; sessionNum++) {
+      const records = [];
+      for (const raw of STUDENTS_DATA) {
+        const st = studentDocMap.get(raw.sn);
+        let isAbsent = false;
+
+        if (raw.sn === 84) {
+          // Afnan absent in sessions 4 and 9 = 12/14 (86%)
+          isAbsent = sessionNum === 4 || sessionNum === 9;
+        } else if (below80Map[raw.sn]) {
+          isAbsent = below80Map[raw.sn].includes(sessionNum);
+        } else {
+          // Regular student: occasional absence
+          isAbsent = (sessionNum === 5 && raw.sn % 7 === 0);
+        }
+
+        records.push({
+          studentId: st._id,
+          status: isAbsent ? 'Absent' : 'Present'
+        });
+      }
+
       await Attendance.create({
-        subjectId: subjects[9]._id,
+        subjectId: subjects[9]._id, // ICT22011 Web App Dev
         lecturerId: lecturer1._id,
-        date: new Date(Date.now() - (15 - i) * 3 * 24 * 60 * 60 * 1000),
-        session: i % 2 === 0 ? 'Practical' : 'Theory',
+        date: new Date(Date.now() - (15 - sessionNum) * 3 * 24 * 60 * 60 * 1000),
+        session: sessionNum % 2 === 0 ? 'Practical' : 'Theory',
         hours: 2,
-        topic: `Lecture Session ${i}: Advanced Full-Stack Architecture & State Management`,
-        records: [
-          { studentId: student1._id, status: isAbsent ? 'Absent' : 'Present' },
-          { studentId: studentDocs[1]._id, status: 'Present' },
-          { studentId: studentDocs[2]._id, status: 'Present' }
-        ]
+        topic: `Lecture Session ${sessionNum}: Advanced Full-Stack Architecture & State Management`,
+        records
       });
     }
 
@@ -884,7 +1010,7 @@ export const runSeed = async () => {
 
     console.log('[Seeding]: Creating Scoped Penalties (Sample)...');
     await Penalty.create({
-      studentId: studentDocs[1]._id, // Not Afnan - strictly student 2 to demonstrate isolation!
+      studentId: studentDocs[1]._id,
       refNumber: 'DISC-FT-2026-03',
       description: 'Late submission of library reference materials beyond loan period.',
       relatedRule: 'Section 14.2: University Library Rules and Regulations',
@@ -894,13 +1020,181 @@ export const runSeed = async () => {
       authorizedBy: 'Assistant Librarian / Dean FT'
     });
 
+    console.log('[Seeding]: Creating Exam Attempt History for Repeat Candidates...');
+    const repeatStudent = studentDocMap.get(113); // G.Sanojan (SEU/IS/21/ICT/064)
+    if (repeatStudent) {
+      await ExamAttempt.create([
+        { studentId: repeatStudent._id, subjectId: subjects[4]._id, attemptNumber: 1, academicYear: '2023/2024', semester: 3, gradeObtained: 'D+', isCurrentAttempt: false, remarks: 'Repeat eligible under university regulations' },
+        { studentId: repeatStudent._id, subjectId: subjects[4]._id, attemptNumber: 2, academicYear: '2024/2025', semester: 3, gradeObtained: 'E', isCurrentAttempt: false, remarks: 'Medical appeal submitted' },
+        { studentId: repeatStudent._id, subjectId: subjects[4]._id, attemptNumber: 3, academicYear: '2024/2025', semester: 4, gradeObtained: 'F', isCurrentAttempt: false, remarks: '3-Attempt ceiling reached' },
+        { studentId: repeatStudent._id, subjectId: subjects[4]._id, attemptNumber: 4, academicYear: '2025/2026', semester: 5, gradeObtained: 'Pending', isCurrentAttempt: true, remarks: 'Faculty Board grace chance petition pending approval' }
+      ]);
+    }
+
+    console.log('[Seeding]: Creating Faculty Board Agenda Items (7 items matching Dean Mockup)...');
+    await FacultyBoardAgenda.create([
+      {
+        title: 'Exam Date Proposal - IT402',
+        category: 'Exam Dates',
+        department: 'Department of Information & Communication Tech.',
+        requestedDate: new Date('2025-04-18'),
+        priority: 'High',
+        status: 'Pending',
+        details: 'Proposed date: 24 April 2025, 09:00 AM in Technology Examination Hall A. HOD feedback received.'
+      },
+      {
+        title: 'Medical Recommendation - SEU/IS/22/ICT/002 CHAMIKARA K.K.R.',
+        category: 'Medical',
+        department: 'Department of Information & Communication Tech.',
+        requestedDate: new Date('2025-04-16'),
+        priority: 'Medium',
+        status: 'Pending',
+        details: 'Hospitalization verification for student CHAMIKARA K.K.R. (SEU/IS/22/ICT/002) during CA evaluation period.'
+      },
+      {
+        title: 'Repeat Grace Chance - SEU/IS/21/ICT/064 G.Sanojan',
+        category: 'Repeat Grace',
+        department: 'Department of Information & Communication Tech.',
+        requestedDate: new Date('2025-04-15'),
+        priority: 'High',
+        status: 'Under Review',
+        details: 'Fourth attempt appeal under Senate Regulation 4.3 for candidate G.Sanojan in ICT21013 Data Structures due to certified medical bereavement.'
+      },
+      {
+        title: 'Exam Date Proposal - EE203',
+        category: 'Exam Dates',
+        department: 'Department of Electrical Engineering',
+        requestedDate: new Date('2025-04-14'),
+        priority: 'Medium',
+        status: 'Pending',
+        details: 'Draft date adjustment to avoid clash with inter-faculty engineering practicals.'
+      },
+      {
+        title: 'Medical Recommendation - ME305',
+        category: 'Medical',
+        department: 'Department of Mechanical Engineering',
+        requestedDate: new Date('2025-04-12'),
+        priority: 'Low',
+        status: 'Approved',
+        details: 'Endorsed by CMO of University Medical Center. Attendance credit validated as Excused_Medical.'
+      },
+      {
+        title: 'Repeat Grace Chance - CE401',
+        category: 'Repeat Grace',
+        department: 'Department of Civil Engineering',
+        requestedDate: new Date('2025-04-11'),
+        priority: 'Medium',
+        status: 'Under Review',
+        details: 'Final grace opportunity for candidate on medical grounds with valid hospital docket.'
+      },
+      {
+        title: 'Exam Date Proposal - MGMT101',
+        category: 'Exam Dates',
+        department: 'Department of Business & Management',
+        requestedDate: new Date('2025-04-10'),
+        priority: 'Low',
+        status: 'Approved',
+        details: 'Common management paper scheduled for 28 April 2025 with Auditorium FT seating.'
+      }
+    ]);
+
+    console.log('[Seeding]: Creating Examination Calendar Events for April 2025...');
+    await ExamSchedule.create([
+      {
+        title: 'Exam Application Close',
+        courseCode: 'ALL',
+        department: 'Examination Division',
+        date: new Date('2025-04-04'),
+        session: 'Morning',
+        venue: 'Examination Division Office',
+        eventType: 'Deadline',
+        status: 'Final'
+      },
+      {
+        title: 'ICT22011 Web App Exam',
+        courseCode: 'ICT22011',
+        courseTitle: 'Web Application Development',
+        department: 'Department of Information & Communication Tech.',
+        date: new Date('2025-04-10'),
+        session: 'Morning',
+        venue: 'Technology Examination Hall A',
+        eventType: 'Exams',
+        status: 'Approved',
+        hodStatus: 'Agreed'
+      },
+      {
+        title: 'CS501 Data Structures Exam',
+        courseCode: 'CS501',
+        courseTitle: 'Data Structures and Algorithms',
+        department: 'Department of Information & Communication Tech.',
+        date: new Date('2025-04-11'),
+        session: 'Morning',
+        venue: 'Technology Examination Hall B',
+        eventType: 'Exams',
+        status: 'Approved',
+        hodStatus: 'Agreed'
+      },
+      {
+        title: 'Faculty Board Meeting',
+        department: 'Dean Office',
+        date: new Date('2025-04-17'),
+        session: 'Morning',
+        venue: 'Faculty Board Room',
+        eventType: 'Board Meeting',
+        status: 'Approved'
+      },
+      {
+        title: 'Medical Appeals Deadline',
+        department: 'Dean Office',
+        date: new Date('2025-04-18'),
+        session: 'Afternoon',
+        venue: 'Office of the Dean',
+        eventType: 'Deadline',
+        status: 'Final'
+      },
+      {
+        title: 'IT402 Network Security Exam',
+        courseCode: 'IT402',
+        courseTitle: 'Network Security & Architecture',
+        department: 'Department of Information & Communication Tech.',
+        date: new Date('2025-04-24'),
+        session: 'Afternoon',
+        venue: 'Technology Examination Hall A',
+        eventType: 'Exams',
+        status: 'Under Consultation',
+        hodStatus: 'Pending Input'
+      },
+      {
+        title: 'Board of Examiners Prep',
+        department: 'Dean Office',
+        date: new Date('2025-04-25'),
+        session: 'Morning',
+        venue: 'Dean Conference Room',
+        eventType: 'Board Meeting',
+        status: 'Approved'
+      },
+      {
+        title: 'MATH301 Advanced Mathematics',
+        courseCode: 'MATH301',
+        courseTitle: 'Advanced Discrete Mathematics',
+        department: 'Department of Mathematics',
+        date: new Date('2025-04-28'),
+        session: 'Morning',
+        venue: 'Technology Examination Hall B',
+        eventType: 'Exams',
+        status: 'Approved'
+      }
+    ]);
+
     console.log('=======================================================');
     console.log(' SEUConnect DATABASE SEEDING COMPLETED SUCCESSFULLY!  ');
     console.log('=======================================================');
     console.log('Test Accounts created:');
     console.log('1. Student  : 22ict085@seu.ac.lk / password123 (M.N.M. Afnan, BICT, Sem 5)');
     console.log('2. Lecturer : rk@seu.ac.lk       / password123 (Dr. R. Ketheeswaran, Dept of ICT)');
-    console.log('3. Admin    : admin@seu.ac.lk    / password123 (Faculty Administrator)');
+    console.log('3. HOD      : hod@seu.ac.lk      / password123 (Dr. Amara Silva, HOD ICT)');
+    console.log('4. Dean     : dean@seu.ac.lk     / password123 (Dr. Eleanor Grant, Dean FT)');
+    console.log('5. Admin    : admin@seu.ac.lk    / password123 (Faculty Administrator)');
     console.log('Forms Seeded: 5 authentic SEUSL forms from uploaded scanned documents');
     console.log('=======================================================');
 
@@ -910,6 +1204,8 @@ export const runSeed = async () => {
       accounts: [
         { role: 'Student', email: '22ict085@seu.ac.lk', password: 'password123', name: 'M.N.M. Afnan' },
         { role: 'Lecturer', email: 'rk@seu.ac.lk', password: 'password123', name: 'Dr. R. Ketheeswaran' },
+        { role: 'HOD', email: 'hod@seu.ac.lk', password: 'password123', name: 'Dr. Amara Silva' },
+        { role: 'Dean', email: 'dean@seu.ac.lk', password: 'password123', name: 'Dr. Eleanor Grant' },
         { role: 'Admin', email: 'admin@seu.ac.lk', password: 'password123', name: 'Faculty Administrator' }
       ]
     };

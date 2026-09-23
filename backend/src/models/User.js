@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   firebaseUid: { type: String, default: null },
   role: {
     type: String,
-    enum: ['student', 'lecturer', 'admin', 'academicAdvisor', 'examinationOfficer', 'facultyAdmin', 'systemAdmin'],
+    enum: ['student', 'lecturer', 'hod', 'dean', 'admin', 'academicAdvisor', 'examinationOfficer', 'facultyAdmin', 'systemAdmin'],
     default: 'student',
     required: true
   },

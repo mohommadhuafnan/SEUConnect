@@ -24,7 +24,8 @@ import {
   BarChart3,
   Sliders,
   ShieldCheck,
-  FolderOpen
+  FolderOpen,
+  Building2
 } from 'lucide-react';
 
 export const Sidebar = ({ isOpen, onClose, onOpenAI }) => {
@@ -216,6 +217,90 @@ export const Sidebar = ({ isOpen, onClose, onOpenAI }) => {
     </>
   );
 
+  const renderHODLinks = () => (
+    <>
+      <div className="sidebar-section-title">DEPARTMENT HEAD</div>
+      <NavLink to="/hod/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <LayoutDashboard size={18} />
+        <span>Dashboard</span>
+      </NavLink>
+      <NavLink to="/hod/attendance" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <Users size={18} />
+        <span>Students</span>
+      </NavLink>
+      <NavLink to="/hod/registrations" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <FileText size={18} />
+        <span>Registration</span>
+      </NavLink>
+      <NavLink to="/hod/attendance" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <CalendarCheck size={18} />
+        <span>Attendance</span>
+      </NavLink>
+      <NavLink to="/hod/examinations" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <Award size={18} />
+        <span>Examinations</span>
+      </NavLink>
+      <NavLink to="/hod/board-prep" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <BarChart3 size={18} />
+        <span>Reports</span>
+      </NavLink>
+      <NavLink to="/hod/escalations" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <HeartHandshake size={18} />
+        <span>Faculty Board</span>
+      </NavLink>
+      <NavLink to="/admin/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <Sliders size={18} />
+        <span>Settings</span>
+      </NavLink>
+    </>
+  );
+
+  const renderDeanLinks = () => (
+    <>
+      <div className="sidebar-section-title">DEAN OFFICE</div>
+      <NavLink to="/dean/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <LayoutDashboard size={18} />
+        <span>Dashboard</span>
+      </NavLink>
+      <NavLink to="/dean/departments" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <GraduationCap size={18} />
+        <span>Faculty Overview</span>
+      </NavLink>
+      <NavLink to="/dean/departments" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <Building2 size={18} />
+        <span>Departments</span>
+      </NavLink>
+      <NavLink to="/dean/withdrawal-risk" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <Users size={18} />
+        <span>Students</span>
+      </NavLink>
+      <NavLink to="/dean/registrations" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <FileText size={18} />
+        <span>Registration</span>
+      </NavLink>
+      <NavLink to="/dean/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <CalendarCheck size={18} />
+        <span>Attendance</span>
+      </NavLink>
+      <NavLink to="/dean/examinations" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <Award size={18} />
+        <span>Examinations</span>
+      </NavLink>
+      <NavLink to="/dean/agenda" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <CheckSquare size={18} />
+        <span>Faculty Board</span>
+      </NavLink>
+      <NavLink to="/dean/departments" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <BarChart3 size={18} />
+        <span>Reports</span>
+      </NavLink>
+      <NavLink to="/admin/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <Sliders size={18} />
+        <span>Settings</span>
+      </NavLink>
+    </>
+  );
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -286,7 +371,24 @@ export const Sidebar = ({ isOpen, onClose, onOpenAI }) => {
         }}>
           {role === 'student' && renderStudentLinks()}
           {role === 'lecturer' && renderLecturerLinks()}
+          {role === 'hod' && renderHODLinks()}
+          {role === 'dean' && renderDeanLinks()}
           {(role === 'admin' || role === 'systemAdmin' || role === 'facultyAdmin') && renderAdminLinks()}
+        </div>
+
+        {/* Bottom Branding (Mockup match) */}
+        <div style={{
+          padding: '10px 16px',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <Building2 size={16} color="#60a5fa" />
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: 600 }}>Building Tomorrow Together</div>
+            <div style={{ fontSize: '0.65rem', color: '#64748b' }}>SEUConnect v1.0</div>
+          </div>
         </div>
 
         {/* Footer Tools */}

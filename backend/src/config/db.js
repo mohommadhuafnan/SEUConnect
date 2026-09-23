@@ -12,10 +12,23 @@ export const connectDB = async () => {
       console.error('=======================================================');
     }
 
-    const conn = await mongoose.connect(ENV.MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000
-    });
-    console.log(`[MongoDB Connected]: ${conn.connection.host}/${conn.connection.name}`);
+    try {
+      const conn = await mongoose.connect(ENV.MONGODB_URI, {
+        serverSelectionTimeoutMS: 5000
+      });
+      console.log(`[MongoDB Connected]: ${conn.connection.host}/${conn.connection.name}`);
+      return conn;
+    } catch (primaryErr) {
+      if (ENV.MONGODB_URI !== 'mongodb://127.0.0.1:27017/seuconnect') {
+        console.warn(`[MongoDB Warning]: Primary connection failed (${primaryErr.message}). Attempting fallback to local MongoDB...`);
+        const fallbackConn = await mongoose.connect('mongodb://127.0.0.1:27017/seuconnect', {
+          serverSelectionTimeoutMS: 5000
+        });
+        console.log(`[MongoDB Connected (Local Fallback)]: ${fallbackConn.connection.host}/${fallbackConn.connection.name}`);
+        return fallbackConn;
+      }
+      throw primaryErr;
+    }
   } catch (error) {
     console.error(`[MongoDB Connection Error]: ${error.message}`);
     console.error('Tip: If using MongoDB Atlas, make sure you whitelist 0.0.0.0/0 in Atlas Network Access and provide valid credentials in MONGODB_URI.');

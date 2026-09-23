@@ -33,7 +33,23 @@ export const StudentRoute = () => {
 
 export const LecturerRoute = () => {
   const { user } = useAuth();
-  if (user?.role !== 'lecturer' && user?.role !== 'admin') {
+  if (user?.role !== 'lecturer' && user?.role !== 'hod' && user?.role !== 'admin') {
+    return <Navigate to="/unauthorized" replace />;
+  }
+  return <Outlet />;
+};
+
+export const HODRoute = () => {
+  const { user } = useAuth();
+  if (user?.role !== 'hod' && user?.role !== 'admin') {
+    return <Navigate to="/unauthorized" replace />;
+  }
+  return <Outlet />;
+};
+
+export const DeanRoute = () => {
+  const { user } = useAuth();
+  if (user?.role !== 'dean' && user?.role !== 'admin') {
     return <Navigate to="/unauthorized" replace />;
   }
   return <Outlet />;

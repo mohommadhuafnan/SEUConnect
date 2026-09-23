@@ -15,7 +15,32 @@ const subjectRegistrationSchema = new mongoose.Schema({
     type: String,
     enum: ['FIRST_ATTEMPT', 'REPEAT', 'FRESH_REPEAT'],
     default: 'FIRST_ATTEMPT'
-  }
+  },
+  // Multi-tier signature & Dean intake pipeline
+  teacherSignature: {
+    type: String,
+    enum: ['Signed', 'Missing', 'Pending'],
+    default: 'Signed'
+  },
+  teacherSignedAt: { type: Date },
+  hodSignature: {
+    type: String,
+    enum: ['Signed', 'Pending'],
+    default: 'Pending'
+  },
+  hodSignedAt: { type: Date },
+  deanOfficeStatus: {
+    type: String,
+    enum: ['Pending', 'Received', 'Approved'],
+    default: 'Pending'
+  },
+  deanIntakeAt: { type: Date },
+  renewalPaymentStatus: {
+    type: String,
+    enum: ['Paid', 'Pending', 'N/A'],
+    default: 'Paid'
+  },
+  paymentVoucherRef: { type: String, default: '' }
 }, { timestamps: true });
 
 subjectRegistrationSchema.index({ studentId: 1, subjectId: 1, academicYear: 1 }, { unique: true });

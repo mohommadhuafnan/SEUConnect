@@ -44,6 +44,12 @@ export const Login = () => {
     } else if (role === 'lecturer') {
       setEmail('rk@seu.ac.lk');
       setPassword('password123');
+    } else if (role === 'hod') {
+      setEmail('hod@seu.ac.lk');
+      setPassword('password123');
+    } else if (role === 'dean') {
+      setEmail('dean@seu.ac.lk');
+      setPassword('password123');
     } else if (role === 'admin') {
       setEmail('admin@seu.ac.lk');
       setPassword('password123');
@@ -196,13 +202,13 @@ export const Login = () => {
           </div>
 
           {/* Role Segmented Controller */}
-          <div className="role-selector-segmented">
+          <div className="role-selector-segmented" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px' }}>
             <button
               type="button"
               onClick={() => handleRoleSelect('student')}
               className={`role-seg-btn ${selectedRole === 'student' ? 'active' : ''}`}
             >
-              <GraduationCap size={16} />
+              <GraduationCap size={15} />
               <span>Student</span>
             </button>
             <button
@@ -210,15 +216,31 @@ export const Login = () => {
               onClick={() => handleRoleSelect('lecturer')}
               className={`role-seg-btn ${selectedRole === 'lecturer' ? 'active' : ''}`}
             >
-              <BookOpen size={16} />
+              <BookOpen size={15} />
               <span>Lecturer</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('hod')}
+              className={`role-seg-btn ${selectedRole === 'hod' ? 'active' : ''}`}
+            >
+              <UserCheck size={15} />
+              <span>HOD</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('dean')}
+              className={`role-seg-btn ${selectedRole === 'dean' ? 'active' : ''}`}
+            >
+              <Building2 size={15} />
+              <span>Dean</span>
             </button>
             <button
               type="button"
               onClick={() => handleRoleSelect('admin')}
               className={`role-seg-btn ${selectedRole === 'admin' ? 'active' : ''}`}
             >
-              <UserCheck size={16} />
+              <ShieldCheck size={15} />
               <span>Admin</span>
             </button>
           </div>
@@ -229,6 +251,12 @@ export const Login = () => {
             )}
             {selectedRole === 'lecturer' && (
               <span>📖 <strong>Lecturer Portal:</strong> Record lecture attendance, submit Continuous Assessment (CA) &amp; ESA scores.</span>
+            )}
+            {selectedRole === 'hod' && (
+              <span>👔 <strong>Head of Department:</strong> Sign subject registration forms, monitor &lt;80% attendance, supervise Board of Examiners CA/ESA &amp; escalate cases.</span>
+            )}
+            {selectedRole === 'dean' && (
+              <span>🏛️ <strong>Dean Portal:</strong> Chair Faculty Board, manage registration &amp; fee intake, build agenda, schedule exams &amp; monitor withdrawal risks.</span>
             )}
             {selectedRole === 'admin' && (
               <span>🛡️ <strong>Faculty Administration:</strong> Govern curriculum modules, academic regulations &amp; student identities.</span>

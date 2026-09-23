@@ -43,6 +43,11 @@ export const login = async (req, res, next) => {
     } else if (user.role === 'lecturer') {
       profile = await Lecturer.findOne({ userId: user._id }).populate('assignedCourses');
       redirectPath = '/lecturer/dashboard';
+    } else if (user.role === 'hod') {
+      profile = await Lecturer.findOne({ userId: user._id }).populate('assignedCourses');
+      redirectPath = '/hod/dashboard';
+    } else if (user.role === 'dean') {
+      redirectPath = '/dean/dashboard';
     } else if (user.role === 'admin' || user.role === 'systemAdmin' || user.role === 'facultyAdmin') {
       redirectPath = '/admin/dashboard';
     }
@@ -85,6 +90,11 @@ export const getMe = async (req, res, next) => {
     } else if (user.role === 'lecturer') {
       profile = await Lecturer.findOne({ userId: user._id }).populate('assignedCourses');
       redirectPath = '/lecturer/dashboard';
+    } else if (user.role === 'hod') {
+      profile = await Lecturer.findOne({ userId: user._id }).populate('assignedCourses');
+      redirectPath = '/hod/dashboard';
+    } else if (user.role === 'dean') {
+      redirectPath = '/dean/dashboard';
     } else if (user.role === 'admin' || user.role === 'systemAdmin' || user.role === 'facultyAdmin') {
       redirectPath = '/admin/dashboard';
     }

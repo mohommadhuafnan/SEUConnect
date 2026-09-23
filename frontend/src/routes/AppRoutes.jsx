@@ -1,9 +1,11 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import { ProtectedRoute, StudentRoute, LecturerRoute, AdminRoute } from './Guards';
+import { ProtectedRoute, StudentRoute, LecturerRoute, HODRoute, DeanRoute, AdminRoute } from './Guards';
 import StudentLayout from '../layouts/StudentLayout';
 import LecturerLayout from '../layouts/LecturerLayout';
+import HODLayout from '../layouts/HODLayout';
+import DeanLayout from '../layouts/DeanLayout';
 import AdminLayout from '../layouts/AdminLayout';
 
 import Login from '../pages/Login';
@@ -33,6 +35,21 @@ import { LecturerCourses, LecturerCourseDetails } from '../pages/lecturer/Course
 import LecturerAttendance from '../pages/lecturer/Attendance';
 import LecturerCAMarks from '../pages/lecturer/CAMarks';
 import { LecturerESAMarks, LecturerProfile } from '../pages/lecturer/ESAMarksAndProfile';
+
+// HOD Pages
+import HODDashboard from '../pages/hod/HODDashboard';
+import HODRegistrations from '../pages/hod/HODRegistrations';
+import HODAttendance from '../pages/hod/HODAttendance';
+import HODExaminations from '../pages/hod/HODExaminations';
+import HODFacultyBoard from '../pages/hod/HODFacultyBoard';
+
+// Dean Pages
+import DeanDashboard from '../pages/dean/DeanDashboard';
+import DeanRegistrations from '../pages/dean/DeanRegistrations';
+import DeanAgenda from '../pages/dean/DeanAgenda';
+import DeanExaminations from '../pages/dean/DeanExaminations';
+import DeanWithdrawalRisk from '../pages/dean/DeanWithdrawalRisk';
+import DeanDepartments from '../pages/dean/DeanDepartments';
 
 // Admin Pages
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -85,6 +102,32 @@ export const AppRoutes = () => {
             <Route path="esa-marks" element={<LecturerESAMarks />} />
             <Route path="forms" element={<StudentForms />} />
             <Route path="profile" element={<LecturerProfile />} />
+          </Route>
+        </Route>
+
+        {/* Authenticated HOD Routes */}
+        <Route element={<HODRoute />}>
+          <Route path="/hod" element={<HODLayout />}>
+            <Route index element={<Navigate to="/hod/dashboard" replace />} />
+            <Route path="dashboard" element={<HODDashboard />} />
+            <Route path="registrations" element={<HODRegistrations />} />
+            <Route path="attendance" element={<HODAttendance />} />
+            <Route path="examinations" element={<HODExaminations />} />
+            <Route path="board-prep" element={<HODExaminations />} />
+            <Route path="escalations" element={<HODFacultyBoard />} />
+          </Route>
+        </Route>
+
+        {/* Authenticated Dean Routes */}
+        <Route element={<DeanRoute />}>
+          <Route path="/dean" element={<DeanLayout />}>
+            <Route index element={<Navigate to="/dean/dashboard" replace />} />
+            <Route path="dashboard" element={<DeanDashboard />} />
+            <Route path="registrations" element={<DeanRegistrations />} />
+            <Route path="agenda" element={<DeanAgenda />} />
+            <Route path="examinations" element={<DeanExaminations />} />
+            <Route path="withdrawal-risk" element={<DeanWithdrawalRisk />} />
+            <Route path="departments" element={<DeanDepartments />} />
           </Route>
         </Route>
 
